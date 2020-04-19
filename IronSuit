@@ -1,4 +1,4 @@
-ref: https://programmers.co.kr/skill_checks/121442
+ref: https://programmers.co.kr/learn/courses/30/lessons/12980
 
 < 문제 정리 >
 한 번에 K 칸을 앞으로 점프
@@ -51,4 +51,5 @@ public class Solution {
 }
 
 < Comment >
-ez
+재귀함수로 풀고 ez하다고 생각했는데 다른 사람 풀이 보니까 2진수로 바꿨을 때 1의 개수를 구하면 딱이다
+위에 @를 0으로 바꾸면 딱 이진법이라니..?
