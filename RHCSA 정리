@@ -1,0 +1,254 @@
+c11.kr/stratis_rhcsa
+c11.kr/vdo_rhcsa
+
+RHCSA 시험 EX200의 목표
+
+필수 툴 이해 및 사용
+셸 프롬프트에 액세스하고 올바른 구문으로 커맨드 실행
+입력-출력 리디렉션(>, >>, |, 2> 등) 사용
+grep 및 정규 표현식을 사용하여 텍스트 분석
+SSH를 사용하여 원격 시스템에 액세스
+로그인하고 멀티유저 타겟에서 사용자 변경
+tar, star, gzip, bzip2를 사용하여 파일 아카이브, 압축, 배포, 압축 해제
+텍스트 파일 생성 및 편집
+파일 및 디렉토리 생성, 삭제, 복사, 이동
+하드 링크와 소프트 링크 생성
+표준 ugo/rwx 권한 목록 작성, 설정 및 변경
+/usr/share/doc에서 man, info, 및 파일을 포함한 시스템 문서를 찾고, 읽고, 사용
+실행 시스템 운영
+시스템을 정상적으로 부팅, 재부팅, 셧다운
+시스템을 수동으로 다른 타겟으로 부팅
+시스템에 액세스하기 위해 부팅 프로세스 중단
+CPU/메모리 사용이 많은 프로세스를 식별하여 중단
+프로세스 스케줄링 조정
+튜닝 프로파일 관리
+시스템 로그 파일 및 저널 확인 및 해석
+시스템 저널 보존
+네트워크 서비스 시작, 중단 및 상태 점검
+안전하게 시스템 간 파일 전송
+로컬 스토리지 설정
+MBR 및 GPT 디스크에서 파티션 목록 작성, 생성, 삭제
+물리 볼륨 생성 및 제거
+볼륨 그룹에 물리 볼륨 할당
+논리 볼륨 생성 및 제거
+UUID(Universally Unique ID)나 라벨을 사용하여 부팅 시 파일 시스템을 마운트하도록 시스템 설정
+어떠한 손실/손상 없이 시스템에 새로운 파티션 및 논리 볼륨과 스왑 추가
+파일 시스템 구축 및 설정
+vfat, ext4, xfs 파일 시스템 생성, 마운트, 분리 및 사용
+NFS를 사용하여 네트워크 파일 시스템 마운트 및 분리
+기존 논리 볼륨 확장
+협업을 위해 set-GID 디렉토리 생성 및 설정
+디스크 압축 설정
+계층화된 스토리지 관리
+파일 권한 문제 진단 및 수정
+시스템 배포, 설정 및 유지 관리
+at과 cron을 사용하여 태스크 스케줄링
+서비스를 시작 및 중단하고 부팅 시 자동으로 시작하도록 서비스 설정
+자동으로 특정 타겟에 시스템이 부팅되도록 설정
+타임 서비스 클라이언트 설정
+Red Hat Network, 원격 리포지토리 또는 로컬 파일 시스템에서 소프트웨어 패키지 설치 및 업데이트
+패키지 모듈 스트림을 사용하여 작업
+시스템 부트로더 수정
+기본 네트워킹 관리
+IPv4 및 IPv6 주소 설정
+호스트 이름 확인 설정
+부팅 시 네트워크 서비스가 자동으로 시작하도록 설정
+firewall-cmd/firewall을 사용하여 네트워크 액세스 제한
+사용자 및 그룹 관리
+로컬 사용자 계정 생성, 삭제, 수정
+로컬 사용자 계정의 비밀번호 변경 및 비밀번호 유효 기간 설정 조정
+로컬 그룹 및 그룹 멤버십 생성, 삭제, 수정
+슈퍼 사용자(superuser) 액세스 설정
+보안 관리
+firewall-cmd/firewalld를 사용하여 방화벽 설정
+파일 액세스 제어 목록 생성 및 사용
+키 기반 SSH 인증 설정
+SELinux 실행 및 허용 범위 모드 설정
+SELinux 파일 목록 작성 및 식별, 컨텍스트 처리
+기본 파일 컨텍스트 복원
+부울 설정을 사용하여 시스템 SELinux 설정 수정
+일반적인 SELinux 정책 위반 진단 및 해결
+
+
+
+2장 시스템 액세스 및 지원 받기
+ln newfile.txt /tmp/newfile-hlink2.txt  //newfile.txt에 대한 하드링크를 /temp.newfile-hlink2.txt에 만든다(원본이 삭제되도 가능)
+ln -s newfile-link2.txt /tmp/newfile-symlink.txt  //소프트링크 생성(원본파일 지워지면 링크가 소실됨)
+
+3장 로컬 사용자 및 그룹 관리
+id  //로그인한 사용자 정보
+id user02                   //user02에 대한 정보
+vim etc/passwd             //로컬 사용자에 대한 정보 저장(마지막 정보는 /bin/bash or /sbin/nologin)
+vim etc/group             //그룹의 정보
+sudo usermod -L user02     //user02에 대한 Lock 걸기
+vim /etc/sudoers          // vim /etc/sudoers.d/operator1
+  %wheel  ALL=(ALL) ALL   //wheel의 메멉가 sudo에 액세스 할 수 있음
+passwd user01             //user01의 비밀번호 변경
+useadd operator1                    //operator1 유저 추가
+usermod -c "Operator One" operator1 //operator1의 사용자 계정 주석 변경
+userdel -r operator3                //operator3 유저 제거
+sudo groupadd -g 10000 group01      //group01이며 GID=10000인 그룹 생성
+sudo groupadd -r group02            //group 생성
+sudo groupmod -n group0022 group02  //group02의 이름을 group0022로 변경
+sudo groupmod -g 20000 group0022   //group0022의 GID를 20000으로 변경
+sudo groupdel group0022
+sudo usermod -g group01 user02     //user02의 그룹을 group01로 변경
+sudo usermod -aG group01 user03     //user03의 보조그룹을 group01로 추가
+echo "%admin ALL=(ALL) ALL" >> /etc/sudoers.d/admin   //admin의 구성원이 모든 관리 권한을 갖도록 변경
+
+sudo chage -m 0 -M 90 -W 7 -I 14 user03 //user03의 암호의 최소 사용 기간, 최대 사용 기간, 경고 기간, 비활성 기간을 설정
+sudo chage -d 0 user03  //user03이 다음 로그인시 강제로 암호를 업데이트 하도록
+sudo chage -l user03  //user03의 암호 사용 기간 정보 표시
+chage -E 2019-08-05 user03  //user03 사용자 계정이 2019-08-05에 만료되도록
+sudo usermod -L -e 2019-10-05 user03  //날짜 이후 계정 잠금
+usermod -s /sbin/nologin user03 
+vim /etc/login.defs   //PASS_MAX_DAYS 등을 변경할 수 있음
+
+
+8장 기본 스토리지 관리
+
+# 블록 장치 정보 보기
+lsblk (-fs, fp)
+
+# 파티션 관리 대화형 세션 열기
+parted /dev/vda
+
+# MBR 생성
+parted /dev/vdb mklabel msdos
+
+# GPT 생성
+parted /dev/vdb mklabel gpt
+
+# MBR에서 한 줄로 파티션 생성
+parted /dev/vdb mkpart primary xfs 2048s 1000MB
+
+# 새 파티션 감지 및 /dev아래 생성
+udevadm settle
+
+# GPT에서 한 줄로 파티션 생성
+parted /dev/vdb mkpart userdata xfs 2048s 1000MB
+
+# 파티션 삭제
+rm 1 (대화형에서 print하고 번호를 제거)
+
+# xfs 파일 시스템 적용하기
+mkfs.xfs /dev/vdb1
+
+# 파일 시스템 마운트하기
+mount /dev/vdb1 /mnt
+
+# 마운트 한 결과 보기
+mount | grep vdb1
+
+# 영속적으로 파일 시스템 마운트
+vim /etc/fstab
+
+# 영속적으로 파일 시스템 마운트 한 이후에 적용하기
+systemctl daemon-reload (//systemctl reboot)
+
+# 스왑 파티션 생성
+parted /dev/vdb mkpart swap1 linux-swap 1001MB 1257MB
+udevadm settle
+mkswap /dev/vdb2  //스왑을 장치에 적용
+swapon /dev/vdb2  //스왑 공간 활성화(free로 활성화되었는지 확인 가능), swapoff, swapon -a, swapon --show
+vim /etc/fstab    //UUID swap swap defaults(pri=10, pri가 높을수록 먼저 사용됨) 0 0
+sytstemctl daemon-reload
+
+
+12장 고급스토리지 기능 구현
+
+# 물리 볼륨 준비
+parted /dev/vdb mkpart primary 1MiB 769Mib
+parted /dev/vdb mkpart primary 770MiB 1026Mib
+parted /dev/vdb set 1 lvm on
+parted /dev/vdb set 2 lvm on
+
+# 물리 볼륨 생성
+pvcreate /dev/vdb1 /dev/vdb2
+
+# 볼륨 그룹 생성
+vggreate vg01 /dev/vdb1 /dev/vdb2
+
+# 논리 볼륨 생성
+lvcreate -n lv01 -L 700M vg01
+
+# 파일 시스템 추가
+mkfs -t xfs /dev/vg01/lv01
+
+# 영속적으로 마운트하기
+vim /etc/fstab
+/dev/vg01/lv01  /mnt/data   xfs   defaults   1  1
+mount /mnt/data   (systemctl daemon-reload 필요 없나?)
+
+# 논리 볼륨 제거
+umount /mnt/data
+lvremove /dev/vg01/lv01
+
+# 볼륨 그룹 제거
+vgremove vg01
+
+# 물리 볼륨 제거
+pvremove /dev/vdb2 /dev/vdb1
+
+# LVM 상태 정보 검토
+pvdisplay /dev/vdb1
+vgdispaly /dev/vg01
+lvdisplay /dev/vg01/lv01
+
+# 논리 볼륨 확장
+parted /dev/vdb mkpart primary 1027Mib 1539Mib
+parted /dev/vdb set 3 lvm on
+pvcreate /dev/vdb3
+vgextend vg01 /dev/vdb3
+lvextend -L +300M /dev/vg01/lv01 (-r)
+xfs_growthfs /mnt/data
+
+# 물리 볼륨 이동
+pvmove /dev/vdb3
+
+# 볼륨 그룹 축소
+vgreduce vg01 /dev/vdb3
+
+# Stratis 사용 준비 설치
+yum install stratisd stratis-cli
+
+# Stratis 활성화
+systemctl enable --now stratisd
+
+# stratis 풀 생성
+stratis pool create pool1 /dev/vdb    //stratis pool list
+
+# stratis 풀에 블록 장치 추가
+stratis pool add-data pool1 /dev/vdc    //stratis blockdev list pool1
+
+# stratis에 filesystem 추가
+stratis filesystem create pool1 filesystem1
+
+# stratis에 snapshot 추가
+stratis filesystem snapshot pool1 filesystem1 snapshot1   //stratis filesystem list
+
+# UUID 보는 법
+lsblk --output=UUID /stratis/pool1/filesystem1
+
+# 영속적으로 추가
+vim /etc/fstab
+UUID /mnt defaults,x-systemd.requires=stratisd.service 0 0
+(systemctl daemon-reload)
+mount /mnt
+
+# filesystem 제거
+stratis filesystem destroy pool1 filesystem1
+
+# vdo 설치
+yum install vdo kmod-kvdo
+
+# vdo 볼륨 생성
+vdo create --name=vdo1 --device=/dev/vdd --vdoLogicalSize=50G       //vdo status --name=vdo1
+
+
+
+
+
+
+
+
