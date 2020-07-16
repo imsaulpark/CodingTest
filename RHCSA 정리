@@ -131,6 +131,166 @@ umask 007
 echo "umask 007" >> ~/.bashrc
 
 
+Chatper 5 SELinux
+
+# 3 modes
+Enforcing: default
+Permissive: can be inactive in runtime environment, but still writes log in background
+Disabled
+
+# SELinux context showing use -Z option
+ps axZ, ls -Z ...
+
+#SELinux mode check
+getenforce
+
+#SElinux mode change
+setenforce
+setenforce 0 or 1(Permissive or Enforcing)
+
+#Permanantly Change
+vim /etc/selinux/config
+systemctl reboot
+
+
+# the differecne between mv and cp about SELinux context
+mv: no change with context
+cp: change context as a new dir's context
+
+# change context
+chcon -t httpd_sys_content_t /virtual
+
+# restore context
+restorecon -v /virtual
+
+# add context
+semanage fcontext -a -t httpd_sys_content_t '/custom(/.*)?'
+(restorecon -R /custom)
+
+# change httpd root
+vim /etc/httpd/conf/httpd.conf
+systemctl enable --now httpd
+
+# get sebool
+getsebool -a      //getsebool httpd_enable_homdirs
+
+# set sebool
+sudo setsebool httpd_enable_homdirs on    //for permnantly: sudo setsebool -P httpd_enable_homdirs_on
+
+# log check
+tail /var/log/audit/audit.log
+tail /var/log/messages        (less)
+
+# use sealert
+sealert -l 613ca624-248d-...
+
+# use ausearch
+ausearch -m AVC -ts recent
+
+
+
+Chapter 6. System Performance Tuning
+
+ps aux | grep job
+kill 5194
+kill -9 5199
+kill -SIGSTOP %2
+kill -SIGTERM %3
+kill _SIGCONT %2
+
+# tuning profile
+yum install tuned
+system enable --now tuned
+
+# tuning check
+tuned-adm active
+
+# tuning list
+tuned-adm list
+
+# change tuning
+tuned-adm profile throughput-performance
+
+# recommend tuning
+tuned-adm recommend
+
+# deactivate tuning
+tuned-adm off
+
+# list ps nice
+ps -o pid,comm,nice
+
+# change nice
+nice -n 15 sha1sum &
+renice -n 19 3521
+
+
+
+Chapter 7. Yum
+
+yum search guile
+yum info guile
+yum install guile
+yum remove guile
+yum group list
+yum group install "RPM Development Tools"
+yum history
+yum history info 6
+
+#repo
+yum repolist all
+yum-config-manager --enable rhel-8-server-debug-rpms
+
+# repo add
+yum-config-manager --add-repo="http://dl.fedoraproject.org/pub/epel/8/x86_64/"        //file name check
+vim /etc/yum.repos.d/dl.fedoraproject.org...
+  gpgcheck=1
+  gpgkey=file:///...
+  
+# rht-updates
+yum-config-manager --enable rht-updates
+
+# module
+yum module info python36
+yum module install python36:3.6/common
+yum module remove postgresql
+yum module disable postgresql
+sudo yum localinstall rhcsa-script....
+
+
+Chapter 9 Service and Booting Process Control
+
+#systemctl
+systemctl status httpd
+systemctl is-active httpd
+
+# make service not to start
+systemctl mask sendmail.service
+
+# make service not to start when booting
+systemctl disable chronyd
+
+
+# systemd target
+systemctl get-default
+systemctl set-default graphical.target
+
+graphical.target
+multi-user.target
+rescue.target
+emergency.target
+
+# change systemd target in runtime
+systemctl isolate multi-user.target
+
+# change systemd target in bootiong
+reboot, e, end of linux line -> systemd.unit=graphical.target
+
+
+
+
+
+
 
 
 
