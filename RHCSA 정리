@@ -105,6 +105,35 @@ usermod -s /sbin/nologin user03
 vim /etc/login.defs   //PASS_MAX_DAYS 등을 변경할 수 있음
 
 
+
+Chapter 4. 파일에 대한 액세스 공유
+
+# change autohrity
+chmod 644 samplefile
+
+# change owner of the file
+chown user01 samplefile         //chown -R user01 sampledir(chane all in dir)
+
+# chanw group of the file
+chown :group01 samplefile
+
+# change owner and the group at once
+chown user01:group01 samplefile
+
+# special authority
+chmod u+s samplefile      //execute as an owner authority
+chmod g+s samplefile      //execute as a group authority, new file in dir is in same group
+chmod o+t samplefile      //ownly owner of the file can delete the file
+
+# umask
+umask
+umask 007
+echo "umask 007" >> ~/.bashrc
+
+
+
+
+
 8장 기본 스토리지 관리
 
 # 블록 장치 정보 보기
@@ -256,6 +285,95 @@ vim /etc/fstab
 UUID /labvdovol xfs defaults,x-systemd.requires=vdo.service 0 0
 mount /labvdovol
 (systemctl daemon-reload)
+
+
+13 Chapter
+
+# crontab usage
+crontab -e
+1 * * * * echo "hello world"
+crontab -l
+
+# every Sunday on January from 1 to 3 o'clock
+0 1-3 * 1 0 order
+
+# every month, first Wendsday, 8, 17 o'clock
+0 8,17 1-7 * 3
+
+# January, every Sunday, 1-3
+0 1-3 * 1 0
+
+# every Tuesday every 5 minutes in 15 o'clock
+5,10,15,20,25,30,35,40,45,50,55,0 15 * * 2
+
+# every 5 minutes
+5,10,15,20,25,30,35,40,45,50,55,0 * * * *
+
+# every day of 3, 09:30
+30 9 3 * *
+
+
+
+14 Chapter
+
+# activate nfs, ver4, tcp and deactivate tcp, ver2,3
+nfsconf --set nfsd udp n
+nfsconf --set nfsd vers2 n
+nfsconf --set nfsd vers3 n
+nfsconf --set nfsd tcp y
+nfsconf --set nfsd vers4 y
+nfsconf --set nfsd vers4.0 y
+nfsconf --set nfsd vers4.1 y
+nfsconf --set nfsd vers4.2 y
+
+# nfs mount
+mount -t nfs serverb.lab.example.com:/shares/public /public
+
+# ls mounted nfs contest
+ls -l /public
+
+# permanantly mount nfs
+vim /etc/fstab
+serverb.lab.example.com:/shares/public  /public   nfs   rw,sync   0   0
+
+ # auto mount(indirect)
+ sudo yum install autofs
+ sudo vim /etc/auto.master.d/demo.autofs
+    /shares   /etc/auto.demo
+ sudo vim /etc/auto.demo
+    work    -rw,sync    serverb:/shares/work      //(/external    -rw,sync,fstype=nfs4    serverb.lab.example.com:/shares/direct/external)
+ sudo systemcall enable --now autofs
+ 
+ # auto mount(direct)
+ sudo vim /etc/auto.master.d/demo.autofs
+    /-    /etc/auto.direct
+ vim /etc/auto.direct
+    /mnt/docs   -rw,sync    serverb:/shares/docs
+    
+ # wildcard
+ vim /etc/auto.demo
+    *   -rw,sync    serverb:/shares/&
+
+
+Chapter 15
+
+firewall-cmd --add-service=mysql
+firewall-cmd --add-service=mysql --permanent
+(fire-wall-cmd --reload)
+
+firewall-cmd --add-service=mysql -zone=internal
+
+firewall-cmd -add-port=80/tcp
+
+
+
+
+
+
+
+
+
+
 
 
 
