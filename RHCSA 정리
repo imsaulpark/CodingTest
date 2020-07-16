@@ -258,41 +258,6 @@ yum module disable postgresql
 sudo yum localinstall rhcsa-script....
 
 
-Chapter 9 Service and Booting Process Control
-
-#systemctl
-systemctl status httpd
-systemctl is-active httpd
-
-# make service not to start
-systemctl mask sendmail.service
-
-# make service not to start when booting
-systemctl disable chronyd
-
-
-# systemd target
-systemctl get-default
-systemctl set-default graphical.target
-
-graphical.target
-multi-user.target
-rescue.target
-emergency.target
-
-# change systemd target in runtime
-systemctl isolate multi-user.target
-
-# change systemd target in bootiong
-reboot, e, end of linux line -> systemd.unit=graphical.target
-
-
-
-
-
-
-
-
 
 8장 기본 스토리지 관리
 
@@ -344,6 +309,66 @@ vim /etc/fstab    //UUID swap swap defaults(pri=10, pri가 높을수록 먼저 �
 sytstemctl daemon-reload
 
 
+
+
+Chapter 9 Service and Booting Process Control
+
+#systemctl
+systemctl status httpd
+systemctl is-active httpd
+
+# make service not to start
+systemctl mask sendmail.service
+
+# make service not to start when booting
+systemctl disable chronyd
+
+
+# systemd target
+systemctl get-default
+systemctl set-default graphical.target
+
+graphical.target
+multi-user.target
+rescue.target
+emergency.target
+
+# change systemd target in runtime
+systemctl isolate multi-user.target
+
+# change systemd target in bootiong
+reboot, e, end of linux line -> systemd.unit=graphical.target
+
+# change passwd of root
+reboot, e, end of linux line -> rd.break
+mount -o remount,rw /sysroot
+chroot /sysroot
+passwd root
+touch /.autorelabel
+
+# system booting problem reparing
+reboot, e, end of linux line -> systemd.unit=emergency.target
+mount -o remount,rw /
+mount -a
+vim /etc/fstab
+systemctl daemon-reload
+mount -a
+systemctl reboot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 12장 고급스토리지 기능 구현
 
 # 물리 볼륨 준비
@@ -356,7 +381,7 @@ parted /dev/vdb set 2 lvm on
 pvcreate /dev/vdb1 /dev/vdb2
 
 # 볼륨 그룹 생성
-vggreate vg01 /dev/vdb1 /dev/vdb2
+vgcreate vg01 /dev/vdb1 /dev/vdb2
 
 # 논리 볼륨 생성
 lvcreate -n lv01 -L 700M vg01
