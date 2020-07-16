@@ -70,6 +70,18 @@ SELinux 파일 목록 작성 및 식별, 컨텍스트 처리
 일반적인 SELinux 정책 위반 진단 및 해결
 
 
+Chapter 1. system access and support
+
+ssh-keygen
+ssh-keygen -f .ssh/key-with-pass
+ssh-copy-id -i .ssh/key-with-pass.pub user@remotehost
+ssh -i .ssh/key-with-pass user@remotehost
+
+ssh-copy-id operator1@servera
+
+ssh operator1@servera hostname
+
+
 
 2장 시스템 액세스 및 지원 받기
 ln newfile.txt /tmp/newfile-hlink2.txt  //newfile.txt에 대한 하드링크를 /temp.newfile-hlink2.txt에 만든다(원본이 삭제되도 가능)
