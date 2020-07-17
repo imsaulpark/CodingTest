@@ -81,11 +81,15 @@ ssh-copy-id operator1@servera
 
 ssh operator1@servera hostname
 
+#키 생성해서 다른 접속자로 전송해서 접속
 
 
 2장 시스템 액세스 및 지원 받기
 ln newfile.txt /tmp/newfile-hlink2.txt  //newfile.txt에 대한 하드링크를 /temp.newfile-hlink2.txt에 만든다(원본이 삭제되도 가능)
 ln -s newfile-link2.txt /tmp/newfile-symlink.txt  //소프트링크 생성(원본파일 지워지면 링크가 소실됨)
+
+
+# 소프트링크, 
 
 3장 로컬 사용자 및 그룹 관리
 id  //로그인한 사용자 정보
@@ -113,10 +117,11 @@ sudo chage -d 0 user03  //user03이 다음 로그인시 강제로 암호를 업�
 sudo chage -l user03  //user03의 암호 사용 기간 정보 표시
 chage -E 2019-08-05 user03  //user03 사용자 계정이 2019-08-05에 만료되도록
 sudo usermod -L -e 2019-10-05 user03  //날짜 이후 계정 잠금
-usermod -s /sbin/nologin user03 
+usermod -s /sbin/nologin user03  
 vim /etc/login.defs   //PASS_MAX_DAYS 등을 변경할 수 있음
 
 
+# 유저 shell 못쓰게 하는 방법, 유저 제거, admin의 구성원이 모든 관리 권한 갖도록 하는 방법, 암호 관련 명령어
 
 Chapter 4. 파일에 대한 액세스 공유
 
@@ -142,6 +147,8 @@ umask
 umask 007
 echo "umask 007" >> ~/.bashrc
 
+
+#umask 영구적으로 바꾸기
 
 Chatper 5 SELinux
 
@@ -200,6 +207,11 @@ sealert -l 613ca624-248d-...
 ausearch -m AVC -ts recent
 
 
+# permissive로 바꾸는 방법, 영구적으로
+# SELinux context 변경방법, 복구방법, /custom을 httpd로 context 추가하는 방법
+# sebool 찾기, 세팅, 영구적으로
+# 로그 찾는 법, 코드 찾기
+
 
 Chapter 6. System Performance Tuning
 
@@ -208,7 +220,7 @@ kill 5194
 kill -9 5199
 kill -SIGSTOP %2
 kill -SIGTERM %3
-kill _SIGCONT %2
+kill -SIGCONT %2
 
 # tuning profile
 yum install tuned
@@ -235,6 +247,9 @@ ps -o pid,comm,nice
 # change nice
 nice -n 15 sha1sum &
 renice -n 19 3521
+
+# 튜닝 체크, 튜닝 리스트 확인, 튜닝 세팅, 추천 튜닝, 튜닝 끄기
+# nice 확인하는법, 설정하는법
 
 
 
@@ -269,6 +284,11 @@ yum module remove postgresql
 yum module disable postgresql
 sudo yum localinstall rhcsa-script....
 
+
+# repo 추가하기
+# rht-updates
+# 모듈 확인하고 설치하기
+# localinstall
 
 
 8장 기본 스토리지 관리
@@ -320,8 +340,61 @@ swapon /dev/vdb2  //스왑 공간 활성화(free로 활성화되었는지 확인
 vim /etc/fstab    //UUID swap swap defaults(pri=10, pri가 높을수록 먼저 사용됨) 0 0
 sytstemctl daemon-reload
 
+#MBR
+parted /dev/vdb mklabel msdos
+parted /dev/vdb mkpart primary xfs 2048s 100MiB
+udevadm settle
+mkfs.xfs /dev/vdb1
+vim /etc/fstab
+systemctl daemon-reload
+mount -a
+
+#GPT
+parted /dev/vdb mklabel gpt
+parted /dev/vdb mkpart part01 xfs 2048s 100MiB
+udevadm settle
+mkfs.xfs /dev/vdb
+vim /etc/fstab
+systemctl daemon-reload
+mount -a
+
+#SWAP
+parted /dev/vdb mklabel gpt
+parted /dev/vdb mkpart swap01 linux-swap 2048s 100MiB
+udevadm settle
+mkswap /dev/vdb1
+swapon /dev/vdb1
+vim /etc/fstab
+systemctl daemon-reload
+mount -a
 
 
+#MBR
+parted /dev/vdb mklabel msdos
+parted /dev/vdb mkpart primary xfs 2048s 1000MiB
+udevadm settle
+mkfs.xfs /dev/vdb1
+mount /dev/vdb /dir
+vim /etc/fstab
+systemctl daemon-reload
+mount -a
+
+#GPT
+parted /dev/vdb mklabel gpt
+parted /dev/vdb mkpart part01 xfs 2048s 1000Mib
+udevadm settle
+mkfs.xfs /dev/vdb1
+...
+
+#SWAP
+parted /dev/vdb mklabel msdos
+parted /dev/vdb mkpart primary linux-swap 2048s 1000Mib
+udevadb settle
+mkswap /dev/vdb1
+swapon /dev/vdb1
+vim /etc/fstab
+  UUID swap swap deafult 0 0
+  
 
 Chapter 9 Service and Booting Process Control
 
@@ -368,16 +441,43 @@ mount -a
 systemctl reboot
 
 
+# 타겟 확인. 타겟 설정, 런타임에서 설정하는법, 부팅에서 설정하는법
+# 루트 비번 바꾸는법
+# 이머전시에서 해결하는법
+
+10장 네트워킹 관리
 
 
+sudo hostnamectl set-hostname servera.lab.example.com
+sudo hostname testname
+
+nmcli con add con-name lab ifname enX type ethernet ipv4.method manual ipv4.address 172.25.250.11/24 ipv4.gateway 172.25.250.254
+nmcli con mod "lab" ipv4.dns 172.25.250.254
+nmcli con mod "lab" connection.autoconnect yes
+nmcli con mod "Wired connection 1" connection.autoconnect no
+
+# host name 변경하는 법
+hostname testname
+sudo hostnamectl set-hostname host1
+# 이더넷 
 
 
+11장 로그 분석 및 저장
+
+timedatectl list-timezones
+timedatectl set-timezone America/Phoenix
+timedatectl set-time 9:00:00
+
+tzselect
+
+vim /etc/chrony.conf
+  server classroom.example.com iburst
+timedatectl set-ntp true
+systemctl restart chronyd
 
 
-
-
-
-
+# 타임존 변경하는 법
+# 시간 동기화 하는 법
 
 
 
@@ -403,7 +503,7 @@ mkfs -t xfs /dev/vg01/lv01
 
 # 영속적으로 마운트하기
 vim /etc/fstab
-/dev/vg01/lv01  /mnt/data   xfs   defaults   1  1
+/dev/vg01/lv01  /mnt/data   xfs   defaults   1  2
 mount /mnt/data   (systemctl daemon-reload 필요 없나?)
 
 # 논리 볼륨 제거
@@ -483,6 +583,98 @@ UUID /labvdovol xfs defaults,x-systemd.requires=vdo.service 0 0
 mount /labvdovol
 (systemctl daemon-reload)
 
+#논리볼륨 만들기
+parted /dev/vdb mklabel msdos
+parted /dev/vdb mkpart primary xfs 1GiB 2GiB
+parted /dev/vdb mkpart primary xfs 2GiB 3GiB
+parted /dev/vdb set 1 lvm on
+parted /dev/vdb set 2 lvm on
+udevadm settle
+pvcreate /dev/vdb1 /dev/vdb2
+vgcreate vg01 /dev/vdb1 /dev/vdb2   (-s 8M)
+lgcreate -n lv01 -n 700M vg01
+mkfs -t xfs /dev/vg01/lv01
+vim /etc/fstab
+  /dev/vg01/lv01 /mnt/data xfs defaults 1 2
+mount -a
+systemctl daemon-reload
+
+#논리볼륨 확장
+parted /dev/vdc mklabel msdos
+parted /dev/vdc mkpart primary xfs 1GiB 2GiB
+parted /dev/vdc set 1 lvm on
+udevadm settle
+pvcreate /dev/vdc1
+vgextend vg01 /dev/vdc1
+lvextend -L +300M /dev/vg01/lv01 -r
+xfs_growthfs /mnt/data
+
+#pv,vg,lv 보기
+
+#startis
+yum install stratisd stratis-cli
+systemctl enable --now stratisd
+stratis pool create pool1 /dev/vdb
+stratis pool add-data pool1 /dev/vdc
+stratis filesystem create pool1 filesystem1
+stratis filesystem snapshot pool1 filesystem1 snapshot1
+lsblk --output=UUID /stratis/pool1/filesystem1
+vim /etc/fstab
+UUID=abcd /mnt/data xfs defaults,x-systemd.requires=stratisd.service 0 0
+mount -a
+systemctl daemon-reload
+
+#vdo
+yum install vdo kmod-kvdo
+vdo create --name=vdo1 --device=/dev/vdd --vdoLogicalSize=500M
+mkfs.xfs -K /dev/mapper/vdo1
+udevadm.settle
+vim /etc/fstab
+UUID /labvdovol xfs defaults,x-systemd.requires=vdo.service 0 0
+mount /labvdovol
+systemctl daemon-reload
+
+#lv만들기
+parted /dev/vdb mklabel msdos
+parted /dev/vdb mkpart primary xfs 2048 1000Mib
+parted /dev/vdb mkpart primary xfs 1000Mib 2000Mib
+parted /dev/vdb set 1 lvm on
+parted /dev/vdb set 2 lvm on
+udevadm settle
+pvcreate /dev/vdb1 /dev/vdb2
+vgcreate vg01 /dev/vdb1 /dev/vdb2
+lvcreate -n lov01 -L 700M vg01
+mkfs -t xfs /dev/vg01/lv01
+lsblk --output=UUID /dev/vg01/lv01
+lsblk --fp
+
+#lv extend
+parted /dev/vdd mkpart primary xfs 1GB 2GB
+udevadm settle
+pvcreate /dev/vdd1
+vgextend vg01 /dev/vdd1
+lvextend -L +300M /dev/vg01/lv01 -r
+xfs_growfs /mnt
+
+#stratis
+yum install stratisd stratis-cli
+systemctl start stratisd
+stratis pool create pool1 /dev/vdb1
+stratis pool add-data pool1 /dev/vdb2
+stratis filesystem create pool1 fs1
+stratis filesystem snapshot create pool1 fs1 fs1-snap
+lsblk
+vim /etc/fstab
+UUID /mnt xfs defaults,x-systemd.requires=stratisd.service 0 0
+
+#vdo
+yum install vod kmod-kvdo
+vdo create --name=vdo1 --device=/dev/vdd --vdoLogicalSize=50M
+mkfs.xfs -K /dev/mapper/vdo1
+vim stab
+UUID /mnt xfs defaults,x-systemd.requires=vdo.service 0 0
+
+
 
 13 Chapter
 
@@ -509,6 +701,17 @@ crontab -l
 # every day of 3, 09:30
 30 9 3 * *
 
+crontab -eu sarah
+* * * * * ...
+systemctl restart crond
+systemctl enable crond
+
+
+# 특정인원에게 예약 걸기
+crontab -eu sarah
+* * * * * echo
+systemctl enable crond
+systemctl restart crond
 
 
 14 Chapter
@@ -551,6 +754,13 @@ serverb.lab.example.com:/shares/public  /public   nfs   rw,sync   0   0
  vim /etc/auto.demo
     *   -rw,sync    serverb:/shares/&
 
+systemctl restart autofs
+systemctl enable autofs
+systemctl enable --now autofs
+
+
+#
+#직접/간접 nfs 자동 마운트
 
 Chapter 15
 
@@ -563,11 +773,36 @@ firewall-cmd --add-service=mysql -zone=internal
 firewall-cmd -add-port=80/tcp
 
 
+tar 사용법
+tar cvf T.tar *         //묶기
+tar xvf T.tar           //풀기
+tar zcvf T.tar.gz *     //gzip
+tar zxvf T.tar gz
+tar jvcf T.tar.bz2 *    //bzip2
+tar jxvf T.tar.bz2
 
 
+acl 사용법
+getfacl file1
+setfacl -m u:user01:6 file1
+
+ssh-keygen
+ssh-copy-id .ssh/key-with-pass.pub operator1
+ssh-copy
 
 
+# tar
+묶기 풀기 gunzip, bunzip2
+tar zcvf T.tar.gz *
+tar jcvf T.tar bz2 *
+tar zxvf T.tar.gz
 
+# acl
+setfacl -m u:user01:rwx file1
+
+systemctl start cockpit.socket
+
+firewall-cmd --add-service=http
 
 
 
